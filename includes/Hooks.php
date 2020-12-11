@@ -113,7 +113,7 @@ class Hooks
                         $article = new WikiPage($titleFromText);        // #custom4training sonst Bug
                         $text    = $article->getContent() ? $article->getContent()->getNativeData() : '';    // #custom4training sonst Bug
                         $text    = preg_replace('%\<noinclude\s*\>(.*)\</noinclude\s*\>%isU', '', $text);
-                        $text    = fnCustomSidebarPreProcess($skin, $text);
+                        $text    = self::customSidebarPreProcess($skin, $text, $wgParser);
                     }
 
                 } while ($text !== $oldtext);
