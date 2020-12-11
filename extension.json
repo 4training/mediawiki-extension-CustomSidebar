@@ -1,0 +1,26 @@
+{
+  "name": "CustomSidebar",
+  "author": [
+    "4training.net"
+  ],
+  "url": "https://www.4training.net",
+  "descriptionmsg": "customsidebar-desc",
+  "license-name": "GPL-2.0-or-later",
+  "type": "other",
+  "requires": {
+    "MediaWiki": ">= 1.31.0"
+  },
+  "AutoloadNamespaces": {
+    "MediaWiki\\Extension\\ForTrainingCustomSidebar\\": "includes/"
+  },
+  "Hooks": {
+    "ParserFirstCallInit": "MediaWiki\\Extension\\ForTrainingCustomSidebar\\Hooks::onParserFirstCallInit",
+    "SkinBuildSidebar": "MediaWiki\\Extension\\ForTrainingCustomSidebar\\Hooks::onSkinBuildSidebar"
+  },
+  "MessagesDirs": {
+    "ForTrainingCustomSidebar": [
+      "i18n"
+    ]
+  },
+  "manifest_version": 2
+}

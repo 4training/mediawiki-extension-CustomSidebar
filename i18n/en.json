@@ -1,0 +1,9 @@
+{
+  "@metadata": {
+    "authors": [
+      "www.4training.net"
+    ]
+  },
+  "generateodt": "ODT-Generator",
+  "customsidebar-desc": "This adds a custom sidebar to www.4training.net"
+}
