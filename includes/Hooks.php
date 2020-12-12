@@ -140,8 +140,10 @@ class Hooks
 
         // taken directly from MediaWiki source v1.14.0
         foreach ($lines as $line) {
-            if (strpos($line, '*') !== 0)
+            if (strpos($line, '*') !== 0) {
                 continue;
+            }
+
             if (strpos($line, '**') !== 0) {
                 $line    = trim($line, '* ');
                 $heading = $line;
@@ -157,21 +159,9 @@ class Hooks
 
             // sanity check
             $line = array_map('trim', explode('|', trim($line, '* '), 2));
-            $link = wfMessage($line[0])->inContentLanguage()->text();    #custom4training Bug
-            if ($link == '-') {
+            $link = self::translate($line[0]);
+            if ($link === '-') {
                 continue;
-            }
-
-            $text = wfMessage($line[1])->text(); #custom4training Bug
-
-            #custom4training Bug
-            if (wfMessage($line[1])->inContentLanguage()->isBlank()) {
-                $text = $line[1];
-            }
-
-            #custom4training Bug
-            if (wfMessage($line[0])->inContentLanguage()->isBlank()) {
-                $link = $line[0];
             }
 
             if (preg_match('/^(?:' . wfUrlProtocols() . ')/', $link)) {
@@ -196,7 +186,7 @@ class Hooks
             }
 
             $newBar[$heading][] = [
-                'text'   => $text,
+                'text'   => self::translate($line[1]),
                 'href'   => $href,
                 'id'     => 'n-' . strtr($line[1], ' ', '-'),
                 'active' => $active,
@@ -216,5 +206,17 @@ class Hooks
             $skin->getTitle(),
             ParserOptions::newFromUser($skin->getContext()->getUser())
         );
+    }
+
+    private static function translate(string $text): string
+    {
+        $message = wfMessage($text)->inContentLanguage();
+
+        #custom4training Bug
+        if ($message->isBlank()) {
+            return $text;
+        }
+
+        return $message->text();
     }
 }
