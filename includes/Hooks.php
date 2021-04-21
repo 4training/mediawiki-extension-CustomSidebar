@@ -101,7 +101,7 @@ class Hooks
         return null;
     }
 
-    private static function getCachedSidebar(string $key, BagOStuff $parserMemc)
+    private static function getCachedSidebar(string $key, BagOStuff $parserMemc): ?string
     {
         global $wgEnableSidebarCache;
         if (!$wgEnableSidebarCache) {
@@ -111,7 +111,7 @@ class Hooks
         return $parserMemc->get($key);
     }
 
-    private static function customSidebarProcess($skin, $NewSideBar, Parser $wgParser)
+    private static function customSidebarProcess($skin, $NewSideBar, Parser $wgParser): array
     {
         $NewSideBar = self::customSidebarPreProcess($skin, $NewSideBar, $wgParser);
 
@@ -134,65 +134,17 @@ class Hooks
             } while ($text !== $oldtext);
         }
 
-        $lines   = explode("\n", $text);
-        $newBar  = [];
-        $heading = '';
+        $navigation = NavigationParser::parse($skin, $text);
+        $newBar     = [];
 
-        // taken directly from MediaWiki source v1.14.0
-        foreach ($lines as $line) {
-            if (strpos($line, '*') !== 0) {
-                continue;
+        // FIXME: Get rid of it since we implement our own rendering
+        foreach ($navigation as $item) {
+            foreach ($item['children'] as $index => $child) {
+                unset($item['children'][$index]['children']);
             }
-
-            if (strpos($line, '**') !== 0) {
-                $line    = trim($line, '* ');
-                $heading = $line;
-                if (!array_key_exists($heading, $newBar)) {
-                    $newBar[$heading] = [];
-                }
-                continue;
-            }
-
-            if (strpos($line, '|') === false) {
-                continue;
-            }
-
-            // sanity check
-            $line = array_map('trim', explode('|', trim($line, '* '), 2));
-            $link = self::translate($line[0]);
-            if ($link === '-') {
-                continue;
-            }
-
-            if (preg_match('/^(?:' . wfUrlProtocols() . ')/', $link)) {
-                $href = $link;
-            } else {
-                $title = Title::newFromText($link);
-                if ($title) {
-                    $title = $title->fixSpecialName();
-                    $href  = $title->getLocalURL();
-                } else {
-                    $href = 'INVALID-TITLE';
-                }
-            }
-
-            // #custom4training: Welcher Punkt der Sidebar ist gerade aktiv?
-            $pos    = strpos($href, 'Special:MyLanguage/');
-            $active = false;
-            if (($pos === 1) && ($skin->getTitle() !== null)) {
-                $linkdest = substr($href, 19);        // das "Special:MyLanguage" am Anfang entfernen
-                $title    = $skin->getTitle()->getLocalURL();
-                $active   = (substr($title, 0, strlen($linkdest)) === $linkdest);    // Fängt der Artikel damit an? (auch Unterseiten wie "Prayer/de" müssen berücksichtigt werden)
-            }
-
-            $newBar[$heading][] = [
-                'text'   => self::translate($line[1]),
-                'href'   => $href,
-                'id'     => 'n-' . strtr($line[1], ' ', '-'),
-                'active' => $active,
-            ];
+            $newBar[$item['text']] = $item['children'];
         }
-        // End Mediawiki source
+        // ENDFIXME
 
         return $newBar;
     }
@@ -206,17 +158,5 @@ class Hooks
             $skin->getTitle(),
             ParserOptions::newFromUser($skin->getContext()->getUser())
         );
-    }
-
-    private static function translate(string $text): string
-    {
-        $message = wfMessage($text)->inContentLanguage();
-
-        #custom4training Bug
-        if ($message->isBlank()) {
-            return $text;
-        }
-
-        return $message->text();
     }
 }
