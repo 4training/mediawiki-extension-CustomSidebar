@@ -135,18 +135,9 @@ class Hooks
         }
 
         $navigation = NavigationParser::parse($skin, $text);
-        $newBar     = [];
+        $template   = $GLOBALS['wgCustomSidebarItemTemplate'] ?? __DIR__ . '/../templates/item.php';
 
-        // FIXME: Get rid of it since we implement our own rendering
-        foreach ($navigation as $item) {
-            foreach ($item['children'] as $index => $child) {
-                unset($item['children'][$index]['children']);
-            }
-            $newBar[$item['text']] = $item['children'];
-        }
-        // ENDFIXME
-
-        return $newBar;
+        return NavigationRenderer::renderSidebar($template, $navigation);
     }
 
     // processes templates and wiki magic words, plus any add'l custom magic words
