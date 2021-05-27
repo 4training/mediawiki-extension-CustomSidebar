@@ -210,10 +210,10 @@ class Hooks
 
     private static function translate(string $text): string
     {
-        $message = wfMessage($text)->inContentLanguage();
+        $message = wfMessage($text);
 
         #custom4training Bug
-        if ($message->isBlank()) {
+        if (wfMessage($text)->inContentLanguage()->isBlank()) {
             return $text;
         }
 
