@@ -20,7 +20,7 @@ class NavigationParser
 
     private function __construct(Skin $skin, array $lines)
     {
-        $this->skin = $skin;
+        $this->skin  = $skin;
         $this->lines = $lines;
         $this->index = -1;
     }
@@ -130,20 +130,21 @@ class NavigationParser
 
         return [
            'level' => $level,
-           'text'  => $line[1] ?? $line[0],
+           'text'  => $line[1] ?? $link,
            'href'  => $href
         ];
     }
 
     private function translate(string $text): string
     {
-        $message = wfMessage($text)->inContentLanguage();
+        // Language::inContentLanguage does not create a new instance but changes the current instance of the message!
+        // We have to create the message twice
 
         #custom4training Bug
-        if ($message->isBlank()) {
+        if (wfMessage($text)->inContentLanguage()->isBlank()) {
             return $text;
         }
 
-        return $message->text();
+        return wfMessage($text)->text();
     }
 }
