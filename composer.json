@@ -1,0 +1,8 @@
+{
+  "name": "4training/custom-sidebar",
+  "type": "mediawiki-extension",
+  "description": "This adds a custom sidebar to www.4training.net",
+  "require": {
+    "php": "^7.1 || ^8.0"
+  }
+}
