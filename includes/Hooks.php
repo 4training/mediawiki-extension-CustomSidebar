@@ -200,7 +200,7 @@ class Hooks
     // processes templates and wiki magic words, plus any add'l custom magic words
     private static function customSidebarPreProcess(Skin $skin, $text, Parser $wgParser)
     {
-        $text = str_ireplace('{{#__username}}', $skin->getContext()->getUser()->getName(), $text);
+        $text = str_ireplace('{{#__username}}', $skin->getContext()->getUser()->getName(), (string) $text);
         return $wgParser->preprocess(
             preg_replace('%\<noinclude\>(.*)\</noinclude\>%isU', '', $text),
             $skin->getTitle(),
